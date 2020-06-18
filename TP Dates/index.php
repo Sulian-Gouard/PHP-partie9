@@ -30,7 +30,7 @@ $daysArray = [
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && (!empty($_POST))) {
-  $nbDays = cal_days_in_month(CAL_GREGORIAN, $_POST['chosenMonth'], $_POST['chosenYear']);
+  $nbDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $_POST['chosenMonth'], $_POST['chosenYear']);
   $firstDayMonth = date('N', mktime(0, 0, 0, $_POST['chosenMonth'], 1, $_POST['chosenYear']));
   $chosenMonth = $_POST['chosenMonth'];
   $chosenYear = $_POST['chosenYear'];
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (!empty($_POST))) {
 
   $monthNow = strftime('%m');
   $yearNow = strftime('%Y');
-  $nbDays = cal_days_in_month(CAL_GREGORIAN, $monthNow, $yearNow);
+  $nbDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $monthNow, $yearNow);
   $firstDayMonth = date('N', mktime(0, 0, 0, $monthNow, 1, $yearNow));
   $chosenMonth = intval($monthNow);
   $chosenYear = $yearNow;
@@ -112,16 +112,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && (!empty($_POST))) {
       <tbody>
         <tr>
           <?php
-          if ($nbDays) {
+          if ($nbDaysInMonth) {
             $day = 0;
-            $casesTotales = $nbDays + $firstDayMonth - 1;
-            for ($caseNb = 1; $caseNb <= $casesTotales + (7 - ($casesTotales % 7)); $caseNb++) {
+            $caseTotal = $nbDaysInMonth + $firstDayMonth - 1;
+
+            if ($caseTotal % 7 == 0) {
+              $bonusCases = 0;
+            } else {
+              $bonusCases = 7 - ($caseTotal % 7);
+            }
+            for ($caseNb = 1; $caseNb <= $caseTotal + $bonusCases; $caseNb++) {
               if ($caseNb >= $firstDayMonth) {
                 $day++
           ?>
-                <td class='<?= $day <= $nbDays ? 'bg-danger' : 'backGroundCases'?>'><?= $day <= $nbDays ? $day : '' ?></td>
+                <td class='<?= $day <= $nbDaysInMonth ? 'bg-danger' : 'bg-warning' ?>'><?= $day <= $nbDaysInMonth ? $day : '' ?></td>
               <?php } else { ?>
-                <td class="backGroundCases"></td>
+                <td class="bg-warning"></td>
               <?php }
               if (($caseNb % 7) == 0) { ?>
         </tr>
